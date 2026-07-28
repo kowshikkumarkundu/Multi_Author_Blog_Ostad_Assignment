@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Published Posts</h1>
+
+<form method="GET" style="margin-bottom: 20px;">
+    <input type="text" name="q" placeholder="Search by title or content..." value="{{ request.GET.q }}">
+    <button type="submit" class="btn">Search</button>
+</form>
+
+<div>
+    <strong>Filter Category:</strong>
+    {% for cat in categories %}
+        <a href="?category={{ cat.slug }}">{{ cat.name }}</a> | 
+    {% endfor %}
+</div>
+
+<hr>
+
+{% for post in page_obj %}
+    <div class="card">
+        {% if post.featured_image %}
+            <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="img-thumb">
+        {% endif %}
+        <h2><a href="{% url 'post_detail' slug=post.slug %}">{{ post.title }}</a></h2>
+        <p>By <a href="{% url 'author_profile' username=post.author.username %}">{{ post.author.username }}</a> in <strong>{{ post.category.name }}</strong> | Views: {{ post.view_count }}</p>
+        <p>{{ post.content|truncatewords:30 }}</p>
+    </div>
+{% empty %}
+    <p>No posts found.</p>
+{% endfor %}
+
+<div>
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+</div>
+{% endblock %}
